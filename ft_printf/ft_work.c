@@ -6,13 +6,13 @@
 /*   By: nryser <nryser@student.42lausane.ch>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/17 16:24:25 by nryser            #+#    #+#             */
-/*   Updated: 2023/12/17 16:24:29 by nryser           ###   ########.fr       */
+/*   Updated: 2023/12/18 16:30:46 by nryser           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int		ft_work(const char *str, va_list ap)
+int	ft_work(const char *str, va_list ap)
 {
 	int		count;
 

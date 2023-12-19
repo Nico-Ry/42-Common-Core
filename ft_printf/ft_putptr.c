@@ -1,37 +1,46 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_putstr.c                                        :+:      :+:    :+:   */
+/*   ft_putptr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: nryser <nryser@student.42lausane.ch>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/17 16:24:49 by nryser            #+#    #+#             */
-/*   Updated: 2023/12/19 17:11:33 by nryser           ###   ########.fr       */
+/*   Created: 2023/12/18 16:31:24 by nryser            #+#    #+#             */
+/*   Updated: 2023/12/19 16:44:20 by nryser           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
+#include "libft.h"
+#include <unistd.h>
 
-int	ft_putstr(char *str)
+static int	ft_ptr_hex(unsigned long nbr, char *hex_chars)
 {
 	int	print_len;
 
 	print_len = 0;
-	if (!str)
+	if (nbr >= 16)
 	{
-		print_len += ft_putstr("(null)");
+		print_len += ft_ptr_hex(nbr / 16, hex_chars);
 		if (print_len < 0)
 			return (-1);
 	}
-	else
-	{
-		while (*str)
-		{
-			if (ft_char(*str) < 0)
-				return (-1);
-			print_len++;
-			str++;
-		}
-	}
+	if (ft_char(hex_chars[nbr % 16]) < 0)
+		return (-1);
+	print_len++;
+	return (print_len);
+}
+
+int	ft_putptr(unsigned long ptr, char *hex_chars)
+{
+	int	print_len;
+
+	print_len = 0;
+	print_len = ft_putstr("0x");
+	if (print_len < 0)
+		return (-1);
+	print_len += ft_ptr_hex(ptr, hex_chars);
+	if (print_len < 0)
+		return (-1);
 	return (print_len);
 }

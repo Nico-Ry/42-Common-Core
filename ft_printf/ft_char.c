@@ -6,15 +6,15 @@
 /*   By: nryser <nryser@student.42lausane.ch>       +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/17 16:23:40 by nryser            #+#    #+#             */
-/*   Updated: 2023/12/17 16:23:45 by nryser           ###   ########.fr       */
+/*   Updated: 2023/12/18 16:25:32 by nryser           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
- #include "ft_printf.h"
+#include "ft_printf.h"
 
 int	ft_char(char c)
 {
-	if (write(1, &c, 1) !=1)
+	if (write(1, &c, 1) != 1)
 		return (-1);
 	return (1);
 }
