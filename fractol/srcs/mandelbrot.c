@@ -1,6 +1,7 @@
 
-
 #include "fractol.h"
+
+// Zn + 1 = Zn + C
 
 void	mandelbrot_init(t_fractol *data)
 {
@@ -18,12 +19,12 @@ void	mandelbrot_calc(t_fractol *data)
 	data->z_r = 0;
 	data->z_i = 0;
 	data->it = 0;
-	while (data->z_r * data->z_r + data->z_i *
-			data->z_i < 4 && data->it < data->it_max)
+	while (data->z_r * data->z_r + data->z_i
+		* data->z_i < 4 && data->it < data->it_max)
 	{
 		data->tmp = data->z_r;
-		data->z_r = data->z_r * data->z_r -
-			data->z_i * data->z_i + data->c_r;
+		data->z_r = data->z_r * data->z_r
+			- data->z_i * data->z_i + data->c_r;
 		data->z_i = 2 * data->z_i * data->tmp + data->c_i;
 		data->it++;
 	}
@@ -36,7 +37,7 @@ void	mandelbrot_calc(t_fractol *data)
 void	*mandelbrot(void *tab)
 {
 	t_fractol	*data;
-	int		tmp;
+	int			tmp;
 
 	data = (t_fractol *)tab;
 	data->x = 0;
@@ -63,7 +64,7 @@ void	mandelbrot_pthread(t_fractol *data)
 	i = 0;
 	while (i < THREAD_NUMBER)
 	{
-		ft_memcpy((void*)&tab[i], (void*)data, sizeof(t_fractol));
+		ft_memcpy((void *)&tab[i], (void *)data, sizeof(t_fractol));
 		tab[i].y = THREAD_WIDTH * i;
 		tab[i].y_max = THREAD_WIDTH * (i + 1);
 		pthread_create(&t[i], NULL, mandelbrot, &tab[i]);

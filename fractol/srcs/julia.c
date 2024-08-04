@@ -1,7 +1,7 @@
 
 #include "fractol.h"
 
-int		mouse_julia(int x, int y, t_fractol *data)
+int	mouse_julia(int x, int y, t_fractol *data)
 {
 	if (data->fract == 1 && data->julia_mouse == 1)
 	{
@@ -30,11 +30,11 @@ void	julia_calc(t_fractol *data)
 	data->z_i = data->y / data->zoom + data->y1;
 	data->it = 0;
 	while (data->z_r * data->z_r + data->z_i
-			* data->z_i < 4 && data->it < data->it_max)
+		* data->z_i < 4 && data->it < data->it_max)
 	{
 		data->tmp = data->z_r;
-		data->z_r = data->z_r * data->z_r -
-			data->z_i * data->z_i - 0.8 + (data->c_r / WIDTH);
+		data->z_r = data->z_r * data->z_r
+			- data->z_i * data->z_i - 0.8 + (data->c_r / WIDTH);
 		data->z_i = 2 * data->z_i * data->tmp + data->c_i / WIDTH;
 		data->it++;
 	}
@@ -46,7 +46,7 @@ void	julia_calc(t_fractol *data)
 
 void	*julia(void *tab)
 {
-	int		tmp;
+	int			tmp;
 	t_fractol	*data;
 
 	data = (t_fractol *)tab;
@@ -74,7 +74,7 @@ void	julia_pthread(t_fractol *data)
 	i = 0;
 	while (i < THREAD_NUMBER)
 	{
-		ft_memcpy((void*)&tab[i], (void*)data, sizeof(t_fractol));
+		ft_memcpy((void *)&tab[i], (void *)data, sizeof(t_fractol));
 		tab[i].y = THREAD_WIDTH * i;
 		tab[i].y_max = THREAD_WIDTH * (i + 1);
 		pthread_create(&t[i], NULL, julia, &tab[i]);

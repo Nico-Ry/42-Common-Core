@@ -11,7 +11,7 @@
 # define THREAD_WIDTH 5
 # define THREAD_NUMBER 120
 
-typedef struct	s_fractol
+typedef struct s_fractol
 {
 	void		*mlx;
 	void		*win;

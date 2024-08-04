@@ -1,5 +1,7 @@
 #include "fractol.h"
 
+//zₙ₊₁ = abs(zₙ)² + c.
+
 void	burningship_init(t_fractol *data)
 {
 	data->it_max = 50;
@@ -17,7 +19,7 @@ void	burningship_calc(t_fractol *data)
 	data->z_i = 0;
 	data->it = 0;
 	while (data->z_r * data->z_r + data->z_i * data->z_i < 4
-			&& data->it < data->it_max)
+		&& data->it < data->it_max)
 	{
 		data->tmp = data->z_r * data->z_r - data->z_i * data->z_i + data->c_r;
 		data->z_i = fabs(2 * data->z_r * data->z_i) + data->c_i;
@@ -32,7 +34,7 @@ void	burningship_calc(t_fractol *data)
 
 void	*burningship(void *tab)
 {
-	int		tmp;
+	int			tmp;
 	t_fractol	*data;
 
 	data = (t_fractol *)tab;
@@ -60,7 +62,7 @@ void	burningship_pthread(t_fractol *data)
 	i = 0;
 	while (i < THREAD_NUMBER)
 	{
-		ft_memcpy((void*)&tab[i], (void*)data, sizeof(t_fractol));
+		ft_memcpy((void *)&tab[i], (void *)data, sizeof(t_fractol));
 		tab[i].y = THREAD_WIDTH * i;
 		tab[i].y_max = THREAD_WIDTH * (i + 1);
 		pthread_create(&t[i], NULL, burningship, &tab[i]);

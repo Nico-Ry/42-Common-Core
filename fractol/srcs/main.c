@@ -35,7 +35,7 @@ void	mlx_win_init(t_fractol *data)
 			&data->bpp, &data->sl, &data->endian);
 }
 
-int		fract_comp(char **av, t_fractol *data)
+int	fract_comp(char **av, t_fractol *data)
 {
 	if (ft_strcmp(av[1], "mandelbrot") == 0)
 		data->fract = 0;
@@ -51,11 +51,12 @@ int		fract_comp(char **av, t_fractol *data)
 	return (1);
 }
 
-int		main(int ac, char **av)
+int	main(int ac, char **av)
 {
 	t_fractol	*data;
 
-	if (!(data = (t_fractol *)malloc(sizeof(t_fractol))))
+	data = (t_fractol *)malloc(sizeof(t_fractol));
+	if (!data)
 		return (-1);
 	if (ac == 2)
 	{

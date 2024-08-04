@@ -1,7 +1,7 @@
 
 #include "fractol.h"
 
-int		key_hook2(int keycode, t_fractol *data)
+int	key_hook2(int keycode, t_fractol *data)
 {
 	if (keycode == 19)
 		data->color = 2050;
@@ -14,7 +14,7 @@ int		key_hook2(int keycode, t_fractol *data)
 	return (0);
 }
 
-int		key_hook(int keycode, t_fractol *data)
+int	key_hook(int keycode, t_fractol *data)
 {
 	if (keycode == 53)
 		exit(1);
@@ -49,13 +49,13 @@ void	ft_zoom(int x, int y, t_fractol *data)
 
 void	ft_dezoom(int x, int y, t_fractol *data)
 {
-	data->x1 = (x / data->zoom + data->x1)  - (x / (data->zoom / 1.3));
+	data->x1 = (x / data->zoom + data->x1) - (x / (data->zoom / 1.3));
 	data->y1 = (y / data->zoom + data->y1) - (y / (data->zoom / 1.3));
 	data->zoom /= 1.3;
 	data->it_max--;
 }
 
-int		mouse_hook(int mousecode, int x, int y, t_fractol *data)
+int	mouse_hook(int mousecode, int x, int y, t_fractol *data)
 {
 	if (mousecode == 4 || mousecode == 1)
 		ft_zoom(x, y, data);
