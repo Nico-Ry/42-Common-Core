@@ -10,7 +10,8 @@ OBJ_NAME = $(SRC_NAME:.c=.o)
 CC = clang
 CFLAGS = -Wall -Werror -Wextra
 
-CPPFLAGS = -I includes -I libft/includes
+LIBFT_PATH = libft
+CPPFLAGS = -I libft/libft.h
 
 LDFLAGS = -L libft
 LDLIBS = -O2 -lft -lm -lmlx -framework OpenGL -framework AppKit
