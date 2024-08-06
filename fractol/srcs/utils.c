@@ -1,30 +1,68 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   utils.c                                            :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: nryser <nryser@student.42lausane.ch>       +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/06 09:39:13 by nryser            #+#    #+#             */
+/*   Updated: 2024/08/06 10:30:49 by nryser           ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include "fractol.h"
+#include <stdio.h>
+#include "utils.h"
 
-int	ft_close(void)
+void	error_message(char *text, int mode)
 {
-	exit(1);
-	return (0);
+	if (mode == 0)
+		perror(text);
+	else if (text)
+		ft_putstr_fd(text, 2);
+	exit(EXIT_FAILURE);
 }
 
-void	put_pxl_to_img(t_fractol *data, int x, int y, int color)
+void	ft_strlower(char *str)
 {
-	if (data->x < WIDTH && data->y < WIDTH)
+	int	i;
+
+	if (!str)
+		return ;
+	i = -1;
+	while (str[++i])
 	{
-		color = mlx_get_color_value(data->mlx, color);
-		ft_memcpy(data->img_ptr + 4 * WIDTH * y + x * 4,
-			&color, sizeof(int));
+		if (str[i] >= 'A' && str[i] <= 'Z')
+			str[i] += 32;
 	}
 }
 
-void	put_text(t_fractol *data)
+void	print(char *str, int fd)
 {
-	char	*text;
-	char	*nb;
+	ft_putstr_fd(str, fd);
+}
 
-	nb = ft_itoa(data->it_max);
-	text = ft_strjoin("iterations : ", nb);
-	mlx_string_put(data->mlx, data->win, 10, 10, 0xFFFFFF, text);
-	ft_strdel(&text);
-	ft_strdel(&nb);
+void	show_help(void)
+{
+	print("\n", 1);
+	print(" +------------------ Let me help you! ---------------------+\n", 1);
+	print(" |                                                         |\n", 1);
+	print(" | Usage: ./fractol [mandelbrot / julia / burning_ship ]   |\n", 1);
+	print(" |                                                         |\n", 1);
+	print(" |                                                         |\n", 1);
+	print(" |                                                         |\n", 1);
+	print(" | e.g: ./fractol mandelbrot                               |\n", 1);
+	print(" |                                                         |\n", 1);
+	print(" |----------------------- KEYBOARD ------------------------|\n", 1);
+	print(" |                                                         |\n", 1);
+	print(" | Press ESC to close the window                           |\n", 1);
+	print(" | Press one of [1-3] to move to another fractal           |\n", 1);
+	print(" | Press one of [Q-Y] keys to change the color of fractal  |\n", 1);
+	print(" | Press one of [A-H] keys to change the color of fractal  |\n", 1);
+	print(" | Use mouse scroll to zoom in and out of the fractal      |\n", 1);
+	print(" | Press the arrow keys to change the viewpoint            |\n", 1);
+	print(" | Press L to lock Julia's fractal                         |\n", 1);
+	print(" | Press Zero to reset the fractal                         |\n", 1);
+	print(" +---------------------------------------------------------+\n", 1);
+	print("\n", 1);
+	exit(EXIT_SUCCESS);
 }

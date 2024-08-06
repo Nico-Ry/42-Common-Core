@@ -1,45 +1,110 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    Makefile                                           :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: nryser <nryser@student.42lausane.ch>       +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2024/08/06 09:38:05 by nryser            #+#    #+#              #
+#    Updated: 2024/08/06 10:37:45 by nryser           ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-NAME = fractol
+# Colors
+RESET			= "\033[0m"
+BLACK    		= "\033[30m"    # Black
+RED      		= "\033[31m"    # Red
+GREEN    		= "\033[32m"    # Green
+YELLOW   		= "\033[33m"    # Yellow
+BLUE     		= "\033[34m"    # Blue
+MAGENTA  		= "\033[35m"    # Magenta
+CYAN     		= "\033[36m"    # Cyan
+WHITE    		= "\033[37m"    # White
 
-SRC_PATH = srcs
-SRC_NAME = main.c hook.c mandelbrot.c julia.c tools.c burningship.c
+# Compiler
+NAME			= fractol
+CC				= cc
+CFLAGS			= -Wall -Wextra -Werror -g3 -fsanitize=address
+OS				= $(shell uname)
+MAKE			= make -sC
+MKDIR			= mkdir -p
+RM				= rm -rf
 
-OBJ_PATH = objs
-OBJ_NAME = $(SRC_NAME:.c=.o)
+# Libs
+LIBFT_DIR		= libft
+LIBFT			= $(LIBFT_DIR)/libft.a
+LINKER  	    = -lft -L $(LIBFT_DIR)
 
-CC = clang
-CFLAGS = -Wall -Werror -Wextra
+# Includes
+INCLUDES_DIR 	= includes
+INCLUDES_FLAG 	= -I$(INCLUDES_DIR) \
+				  -I$(LIBFT_DIR) \
 
-LIBFT_PATH = libft
-CPPFLAGS = -I libft/libft.h
+INCLUDES		= $(wildcard $(INCLUDES_DIR)/*.h) \
+				  $(LIBFT_DIR)/libft.h \
 
-LDFLAGS = -L libft
-LDLIBS = -O2 -lft -lm -lmlx -framework OpenGL -framework AppKit
+# Sources
+SRCS_DIR		= srcs/
+SRC_FILES		= main.c \
+				  utils.c \
+				  events.c \
+				  render.c \
+			 	  fractals.c \
+				  make_engine.c \
 
-SRC = $(addprefix $(SRC_PATH)/,$(SRC_NAME))
-OBJ = $(addprefix $(OBJ_PATH)/,$(OBJ_NAME))
+SRCS			= $(addprefix $(SRCS_DIR), $(SRC_FILES))
 
-all: $(NAME)
+# Objects
+OBJS_DIR		= objs/
+OBJ_FILES		= $(SRC_FILES:.c=.o)
+OBJS			= $(addprefix $(OBJS_DIR), $(OBJ_FILES))
 
-$(NAME): $(OBJ)
-	@make -C libft
-	@$(CC) $(LDFLAGS) $(LDLIBS) $^ -o $@
-	@echo "Compilation of Fractol:	\033[1;32mOK\033[m"
+# Platform-dependent compilation
+ifeq ($(OS), Linux)
+	MLX_DIR			= mlx_linux
+	MLX				= $(MLX_DIR)/libmlx.a
+	LINKER			+= -lmlx -lm -lz -lXext -lX11 -L $(MLX_DIR)
+	INCLUDES_FLAG	+= -I$(MLX_DIR)
+else
+	MLX_DIR			= mlx_macos
+	MLX				= $(MLX_DIR)/libmlx.a
+	LINKER			+= -lmlx -lm -framework OpenGl -framework Appkit -L $(MLX_DIR)
+	INCLUDES_FLAG	+= -I$(MLX_DIR)
+endif
 
-$(OBJ_PATH)/%.o: $(SRC_PATH)/%.c
-	@mkdir $(OBJ_PATH) 2> /dev/null || true
-	@$(CC) $(CFLAGS) -c $< $(CPPFLAGS) -o $@
 
-clean:
-	@make -C libft clean
-	@rm -f $(OBJ)
-	@rmdir $(OBJ_PATH) 2> /dev/null || true
-	@echo "Fractol: Removing Objs"
+all : $(LIBFT) $(MLX) $(OBJS_DIR) $(NAME)
 
-fclean: clean
-	@make -C libft fclean
-	@rm -f $(NAME)
-	@echo "Fractol : Removing Fractol"
+$(LIBFT) :
+	@echo $(CYAN) " - Making libft..." $(RESET)
+	@$(MAKE) $(LIBFT_DIR)
+	@echo $(YELLOW) " - Made libft!" $(RESET)
+
+$(MLX) :
+	@echo $(CYAN) " - Making mlx..." $(RESET)
+	@$(MAKE) $(MLX_DIR)
+	@echo $(YELLOW) " - Made mlx!" $(RESET)
+
+$(OBJS_DIR) :
+	@$(MKDIR) $(OBJS_DIR)
+
+$(NAME) : $(OBJS) Makefile
+	@echo $(GREEN) " - Compiling $(NAME)..." $(RESET)
+	@$(CC) $(CFLAGS) $(OBJS) $(LINKER) -o $(NAME)
+	@echo $(YELLOW) " - Compiling FINISHED" $(RESET)
+
+$(OBJS_DIR)%.o : $(SRCS_DIR)%.c $(INCLUDES)
+	@$(CC) $(CFLAGS) $(INCLUDES_FLAG) -c $< -o $@
+
+clean :
+	@$(RM) $(OBJS_DIR)
+	@echo $(RED) " - Cleaned!" $(RESET)
+
+fclean : clean
+	@$(RM) $(NAME)
+	@$(MAKE) $(MLX_DIR) clean
+	@$(MAKE) $(LIBFT_DIR) fclean
+	@echo $(RED) " - Full Cleaned!" $(RESET)
 
 re: fclean all
 
