@@ -59,16 +59,16 @@ If a philosopher dies:
 1234	3	died
 
 ## **Code Structure**
-main.c: Orchestrates initialization, simulation, and cleanup.
-simulation_init.c: Handles argument parsing and memory allocation.
-philo_actions.c: Manages philosophers taking forks, eating, and releasing forks.
-philo_states.c: Handles sleeping and thinking states.
-philo_threads.c: Creates and manages threads for philosophers.
-health_monitor.c: Monitors philosopher health and handles simulation termination.
-utils.c: Provides utility functions (e.g., time management).
-print_status.c: Logs philosopher states.
-validate_args.c: Validates command-line arguments.
-parse_args.c: Parses command-line arguments.
+- main.c: Orchestrates initialization, simulation, and cleanup.
+- simulation_init.c: Handles argument parsing and memory allocation.
+- philo_actions.c: Manages philosophers taking forks, eating, and releasing forks.
+- philo_states.c: Handles sleeping and thinking states.
+- philo_threads.c: Creates and manages threads for philosophers.
+- health_monitor.c: Monitors philosopher health and handles simulation termination.
+- utils.c: Provides utility functions (e.g., time management).
+- print_status.c: Logs philosopher states.
+- validate_args.c: Validates command-line arguments.
+- parse_args.c: Parses command-line arguments.
 ## **Design Considerations**
 - Thread Safety:
 	- Mutexes are used to protect shared resources (forks, logs).
