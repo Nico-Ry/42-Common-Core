@@ -29,11 +29,11 @@ This project implements the classic **Dining Philosophers Problem** using multit
 ./philo [number_of_philosophers] [time_to_die] [time_to_eat] [time_to_sleep] [number_of_times_each_philosopher_must_eat (optional)]
 
 Arguments
-number_of_philosophers (1–200): Number of philosophers at the table.
-time_to_die (>100 ms): Maximum time a philosopher can go without eating.
-time_to_eat (>100 ms): Time taken to eat a meal.
-time_to_sleep (>100 ms): Time spent sleeping after eating.
-number_of_times_each_philosopher_must_eat (optional): Ends the simulation after all philosophers eat this many meals.
+- number_of_philosophers (1–200): Number of philosophers at the table.
+- time_to_die (>100 ms): Maximum time a philosopher can go without eating.
+- time_to_eat (>100 ms): Time taken to eat a meal.
+- time_to_sleep (>100 ms): Time spent sleeping after eating.
+- number_of_times_each_philosopher_must_eat (optional): Ends the simulation after all philosophers eat this many meals.
 
 Example bash
 
@@ -46,8 +46,8 @@ This starts a simulation with:
 200 ms to sleep.
 Ends after each philosopher eats 3 meals.
 
-Output
-Each philosopher logs their state with a timestamp (in milliseconds) and their ID:
+- Output
+	- Each philosopher logs their state with a timestamp (in milliseconds) and their ID:
 
 
 0	1	is thinking
@@ -55,7 +55,7 @@ Each philosopher logs their state with a timestamp (in milliseconds) and their I
 15	2	is eating
 217	2	is sleeping
 
-If a philosopher dies:
+- If a philosopher dies:
 1234	3	died
 
 ## **Code Structure**
