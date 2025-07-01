@@ -67,40 +67,55 @@ void PhoneBook::searchContact() {
 	std::string nickname;
 	std::string phoneNumber;
 	std::string darkestSecret;
+	std::string input;
 	int index;
 
 	if (list[0].getName() == "") {
 		std::cout << RED << "No contacts available" << RESET << std::endl;
 		return;
 	}
+
 	std::cout << "|----------|----------|----------|----------|" << std::endl;
 	std::cout << "|     Index|First name| Last name|  Nickname|" << std::endl;
 	std::cout << "|----------|----------|----------|----------|" << std::endl;
-	for(int i = 0; i < 8; i++) {
+
+	for (int i = 0; i < 8; i++) {
 		if (list[i].getName() != "") {
 			std::cout << "|" << std::setw(10) << i + 1 << "|";
+
 			name = list[i].getName();
-			if (name.length() > 10) {
+			if (name.length() > 10)
 				name = name.substr(0, 9) + ".";
-			}
 			std::cout << std::setw(10) << name << "|";
+
 			lastName = list[i].getLastName();
-			if (lastName.length() > 10) {
+			if (lastName.length() > 10)
 				lastName = lastName.substr(0, 9) + ".";
-			}
 			std::cout << std::setw(10) << lastName << "|";
+
 			nickname = list[i].getNickname();
-			if (nickname.length() > 10) {
+			if (nickname.length() > 10)
 				nickname = nickname.substr(0, 9) + ".";
-			}
 			std::cout << std::setw(10) << nickname << "|" << std::endl;
+
 			std::cout << "|----------|----------|----------|----------|" << std::endl;
 		}
 	}
-	std::cout << YELLOW << "--Select contact index or -1 to return to de menu--" << RESET << std::endl;
+
+	std::cout << YELLOW << "--Select contact index or -1 to return to the menu--" << RESET << std::endl;
 	std::cout << "Enter index: ";
-	if (!(std::cin >> index) || index == -1)
+	std::getline(std::cin >> std::ws, input);
+
+	if (input == "-1")
 		return;
+
+	if (input.find_first_not_of("012345678") != std::string::npos) {
+		std::cout << RED << "Invalid input. Please enter a number between 1 and 8." << RESET << std::endl;
+		return;
+	}
+
+	index = std::stoi(input);
+
 	if (index > 0 && index < 9 && list[index - 1].getName() != "") {
 		std::cout << PURPLE << "CONTACT INFO:" << std::endl;
 		std::cout << "First name: " << list[index - 1].getName() << std::endl;
