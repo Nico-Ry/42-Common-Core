@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nryser <nryser@student.42lausanne.ch>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/30 11:10:39 by nryser            #+#    #+#             */
-/*   Updated: 2025/01/30 11:11:33 by nryser           ###   ########.ch       */
+/*   Created: 2026/02/05 16:31:44 by nryser            #+#    #+#             */
+/*   Updated: 2026/02/05 16:32:33 by nryser           ###   ########.ch       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,6 +137,8 @@ int	handle_command_or_redirection(t_minishell *minish,
 	t_command	*cmd_data;
 	int			status;
 
+	status = 0;
+	cmd_data = NULL;
 	redir_ast = validate_command_ast(minish, ast);
 	if (!redir_ast)
 	{
