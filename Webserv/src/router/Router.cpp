@@ -1,0 +1,328 @@
+#include <cstdlib>
+#include <sstream>
+#include <unistd.h>
+#include "utils.hpp"
+#include "http/Mime.hpp"
+#include "router/Router.hpp"
+#include "router/PathUtils.hpp"
+#include "cgi/CgiHandler.hpp"
+
+Router::Router(const Config& cfg, const ServerBlock* serverBlock)
+	: cfg(cfg), server(serverBlock), rules(NULL) {}
+
+Router::~Router() {}
+
+
+
+/**
+ * @brief Generates a set filled with all parent paths in descending order (longest to shortest).
+ * @note Such that: `/www/images/data` would produce: `/www/images/data`, `/www/images`, `/www` and `/`
+ */
+DescendingStrSet	Router::genParentPaths(const std::string& uri)
+{
+	DescendingStrSet	parentPaths;
+
+// start by inserting root as fallback
+	parentPaths.insert("/");
+
+// defensive coding in case empty URI
+	if (uri.empty())
+		return (parentPaths);
+
+// Read URI char by char inserting everything that's been read
+// into buf. Once "/" is encountered insert buf in parentPaths.
+
+	std::string	buf;
+	for (size_t i=0; i < uri.length(); ++i)
+	{
+		char c = uri[i];
+
+		if (c == '/' && buf.length() > 1)// insert if longer than "/"
+				parentPaths.insert(buf);
+		buf += c;
+	}
+
+	parentPaths.insert(uri);//				insert full URI
+	// printParentPaths(parentPaths);//		Uncomment to print all parent paths
+	return (parentPaths);
+}
+
+/**
+ * @brief finds the longest matching Location Block for the given URI.
+ * @attention Just because no location blocks match the URI does not mean the
+ * file/directory doesn't exist. In case no matches are found, we fallback to '/'.
+ * Actual validation of existence will be performed later.
+ */
+void	Router::getLocation(const std::string& uri)
+{
+
+	DescendingStrSet	paths = genParentPaths(uri);
+
+	const LocationBlock* fallback = NULL;
+// iterate through parent paths from longest to shortest
+	for (DescendingStrSet::iterator it=paths.begin(); it != paths.end(); ++it)
+	{
+		std::string	longestUri = *it;
+
+		//check if longest URI matches any location block in server
+		for (size_t i=0; i < server->locations.size(); ++i)
+		{
+			//store index of fallback LocationBlock
+			if (server->locations[i].uri == "/")
+				fallback = &server->locations[i];
+			if (server->locations[i].uri == longestUri)
+			{
+				this->rules = &server->locations[i];
+				return ;
+			}
+		}
+	}
+// No matches found, fallback to '/', validate existence of file later
+	if (fallback)
+		this->rules = fallback;
+// No "/" Location Block, build default one from ServerBlock
+	else
+	{
+		this->defaultLoc = LocationBlock(*server);
+		this->rules = &defaultLoc;
+	}
+}
+
+
+bool	Router::methodAllowed(const HttpMethod& method)
+{
+	std::string	target;
+
+//	Convert enum to string
+	if (method == METHOD_GET)
+		target = "GET";
+	else if (method == METHOD_DELETE)
+		target = "DELETE";
+	else if (method == METHOD_POST)
+		target = "POST";
+	else
+		target = "NOT IMPLEMENTED";
+
+	for (size_t i=0; i < rules->methods.size(); ++i)
+	{
+		if (target == rules->methods[i])
+			return (true);
+	}
+	return (false);
+}
+
+
+bool	Router::exceedsMaxSize(const size_t& len)
+{
+	if (len >= rules->clientMaxBodySize)
+		return (true);
+	return (false);
+}
+
+
+
+// helper function to read file into string
+bool	Router::readFileToString(const std::string& path, std::string& responseBody)
+{
+	// std::ios::in		= flag for open in read mode
+	// std::ios::binary	= flag for read raw bytes as they are -> do not auto-modify "\r\n" to "\n"
+	std::ifstream ifs(path.c_str(), std::ios::in | std::ios::binary);
+
+
+// checks file exists, has read permission and path is valid
+	if (!ifs.is_open())
+		return (false);
+
+// read and copy over
+	std::ostringstream oss;
+	oss << ifs.rdbuf();
+	responseBody = oss.str();
+	return (true);
+}
+
+
+
+HttpResponse	Router::buildRedirectResponse(const int& code, const std::string& target)
+{
+	std::string	statusMsg;
+
+	if (code == 301)
+		statusMsg = "Moved Permanently";
+	else if (code == 302)
+		statusMsg = "Found";
+	else if (code == 303)
+		statusMsg = "See Other";
+	else//	if no code matches return internal server error
+		return (HttpResponse(500, "Internal Server Error"));
+
+	return (HttpResponse(target, code, statusMsg));
+}
+
+static bool	endsWith(const std::string& s, const std::string& suffix)
+{
+	if (suffix.size() > s.size())
+		return (false);
+	return (s.compare(s.size() - suffix.size(), suffix.size(), suffix) == 0);
+}
+
+bool	Router::isCgiRequest(const HttpRequest& req) const
+{
+	// "rules" should already be the matched LocationBlock (router sets this).
+	if (rules == NULL)
+		return (false);
+
+	// CGI is only enabled if the location explicitly configured it
+	if (rules->hasCgiExtension == false)
+		return (false);
+
+	// Subject requires CGI decision based on extension
+	if (endsWith(req.path, rules->cgiExtension) == false)
+		return (false);
+
+	return (true);
+}
+
+
+
+/**
+ * @brief Validates all Routing is correct for a given HTTP request
+ * @note checks: Port, URI, Max Size.
+ */
+HttpResponse	Router::routing(const HttpRequest& req)
+{
+
+// Find correct context for requestURI
+	getLocation(req.path);
+	if (!rules)// should never happen, defensive coding
+		return (HttpResponse(500, "Internal Server Error"));
+
+// ==========================================================================
+// CGI HANDLING (checked BEFORE redirects and method validation)
+// - CGI scripts use a direct path (./cgi-bin/script.py)
+// - CGI bypasses location rules (methods, redirects) to stay independent
+// - Only maxBodySize is checked for security
+// ==========================================================================
+	if (isCgiRequest(req))
+	{
+		if (exceedsMaxSize(req.body.size()))
+			return (HttpResponse(413, "Payload Too Large"));
+
+		// Build the filesystem path //location /cgi-bin { root .; cgi_extension .py; } /cgi-bin/form.py → ./cgi-bin/form.py
+		std::string scriptPath = getResolvedPath(req.path, *rules);
+
+		// Check if CGI script exists (return 404 if not found)
+		if (access(scriptPath.c_str(), F_OK) != 0)
+			return (HttpResponse(404, "Not Found"));
+
+		std::cout << std::left << YELLOW << std::setw(16) << "[CGI]" << RES
+				<< "  ~   " << BOLD_BLUE << scriptPath << RES << std::endl;
+
+		// Return a "CGI pending" response - Server will launch CGI asynchronously
+		HttpResponse resp(0, "CGI Pending");
+		resp.isCgiPending = true;
+		resp.cgiScriptPath = scriptPath;
+		return resp;
+	}
+
+
+	// std::cout << "[DEBUG ROUTER] method=" << req.method
+	// 		<< " path='" << req.path << "'" << std::endl;
+
+	std::cout << BOLD_BLUE << getResolvedPath(req.path, *rules) << std::endl;
+// TODO: a function that matches redirection code with
+//       the appropriate redirection message and stores
+//       the locationBlock pointer of the request so we
+//		 can find rules->redirectTarget when build HttpResponse
+	if (rules->hasRedirect)
+		return (buildRedirectResponse(rules->redirectCode, rules->redirectTarget));
+
+// Basic Validation Before handling requested method
+
+	if (!methodAllowed(req.method))
+		return (HttpResponse(405, "Method Not Allowed"));
+
+	if (exceedsMaxSize(req.body.size()))//changed to bodySize to handle chunked requests
+		return (HttpResponse(413, "Payload Too Large"));
+
+// Split logic to handle GET, DELETE and POST separately
+	if (req.method == METHOD_GET)
+		return (handleGet(req.path));
+
+	else if (req.method == METHOD_DELETE)
+		return (handleDelete(req.path));
+
+	else if (req.method == METHOD_POST)
+		return (handlePost(req));
+
+	return (HttpResponse(501, "Not Implemented"));
+}
+
+
+HttpResponse Router::buildResponse(const HttpRequest& req)
+{
+	//Kept HttpResponse as may need Location pointer for POST so we can provide the path of where the upload occured
+
+	HttpResponse		result = routing(req);
+
+	if (result.isCgiPending && result.statusCode == 0)
+		return (result);
+	if (result.isSuccess())
+		printSuccess(result);
+	else if (result.isRedirect)
+		printRedirect(result);
+	else
+	{
+		printNonSuccess(result);
+		if (!tryToServeCustomErrorPage(result)) {
+			result.body = generateErrorHtml(result.statusCode, result.reason);
+			result.headers["Content-Type"] = "text/html";
+		}
+	}
+
+	return (result);
+}
+
+bool	Router::tryToServeCustomErrorPage(HttpResponse& r) {
+	std::map<int, StringVec>::const_iterator	it = rules->errorPages.find(r.statusCode);
+	if (it == rules->errorPages.end())
+		return false; //->	No error files defined in config for status code
+
+
+
+//	try each file, first success returns true
+	for (size_t i=0; i < it->second.size(); ++i) {
+		const std::string	errorPagePath = it->second[i];
+		const std::string	resolvedPath = joinPath(server->root, errorPagePath);
+		std::string	buffer;
+
+		// std::cout << YELLOW << "Searching for: " << RES << resolvedPath << std::endl;
+		if (!exists(resolvedPath)) {
+			logCustomErrorPage_Warning("Custom error page not found", resolvedPath);
+			continue;
+		}
+		// else
+		// 	std::cout << GREEN << "Found custom error page: " << RES << resolvedPath << std::endl;
+		if (!isFile(resolvedPath)) {
+			logCustomErrorPage_Warning("Not a file", resolvedPath);
+			continue;
+		}
+		// else
+		// 	std::cout << GREEN << "Is a file: " << RES << resolvedPath << std::endl;
+
+		if (!readFileToString(resolvedPath, buffer))  {
+			logCustomErrorPage_Error("Failed to read file", resolvedPath);
+			continue;
+		}
+		// else
+		// 	std::cout << GREEN << "Read custom error page successfully: " << RES << resolvedPath << std::endl;
+
+		r.body = buffer;
+		r.headers["Content-Type"] = Mime::fromPath(resolvedPath);
+		// r.headers["Content-Type"] = "text/html";
+
+		return true;
+	}
+	return false;
+}
+
+// std::vector<std::string>					err_pages = rules->errorPages;
