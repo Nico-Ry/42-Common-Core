@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nryser <nryser@student.42lausanne.ch>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/04 19:13:42 by nryser            #+#    #+#             */
-/*   Updated: 2026/02/04 19:13:42 by nryser           ###   ########.ch       */
+/*   Created: 2026/02/08 17:13:41 by nryser            #+#    #+#             */
+/*   Updated: 2026/02/08 17:13:49 by nryser           ###   ########.ch       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,14 +23,13 @@ class	RPN
 {
 	private:
 		/*
-			We use a stack to evaluate Reverse Polish Notation:
+			Use a stack to evaluate Reverse Polish Notation:
 			- push numbers
 			- when an operator appears, pop 2 operands, apply, push result
 		*/
 		std::stack<int, std::list<int> >	_stack;
 		int									_result;
 
-	private:
 		// Check if c is one of the allowed operators: + - * /
 		bool	isOperator(char c) const;
 

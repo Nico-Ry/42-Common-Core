@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nryser <nryser@student.42lausanne.ch>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/04 16:12:29 by nryser            #+#    #+#             */
-/*   Updated: 2026/02/04 16:12:29 by nryser           ###   ########.ch       */
+/*   Created: 2026/02/08 18:14:58 by nryser            #+#    #+#             */
+/*   Updated: 2026/02/08 18:15:08 by nryser           ###   ########.ch       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class	BitcoinExchange
 	private:
 		/*
 			Value parsing/validation status.
-			We use this to avoid throwing exceptions for normal input mistakes.
+			I use this to avoid throwing exceptions for normal input mistakes.
 		*/
 		enum ValueStatus
 		{
@@ -58,7 +58,6 @@ class	BitcoinExchange
 		*/
 		DataLine							LineData;
 
-	private:
 		/* ---------- data.csv loading ---------- */
 
 		// Parse 1 CSV line: "YYYY-MM-DD,rate" and store into btcData

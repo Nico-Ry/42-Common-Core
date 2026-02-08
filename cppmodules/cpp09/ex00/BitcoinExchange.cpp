@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nryser <nryser@student.42lausanne.ch>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/04 16:13:43 by nryser            #+#    #+#             */
-/*   Updated: 2026/02/04 16:17:30 by nryser           ###   ########.ch       */
+/*   Created: 2026/02/08 18:14:17 by nryser            #+#    #+#             */
+/*   Updated: 2026/02/08 18:14:28 by nryser           ###   ########.ch       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,8 +151,10 @@ void	BitcoinExchange::expectHeader(std::ifstream &file)
 {
 	std::string	line;
 
-	if (!std::getline(file, line) || line != "date | value")
-		throw std::string("invalid first line in data file. Expected 'date | value'.");
+	if (!std::getline(file, line))
+		return ;
+	if (line != "date | value")
+		printBadInput(line);
 }
 
 /* ************************************************************************** */
@@ -236,7 +238,7 @@ bool	BitcoinExchange::isLeapYear(int year)
 
 /*
 	Calendar validation only.
-	We do NOT hardcode a min/max year, because the evaluator's data.csv can vary.
+	I do NOT hardcode a min/max year, because the evaluation data.csv can vary.
 */
 void	BitcoinExchange::checkDate(int year, int month, int day)
 {

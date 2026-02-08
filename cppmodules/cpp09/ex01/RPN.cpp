@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: nryser <nryser@student.42lausanne.ch>     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026/02/04 19:14:43 by nryser            #+#    #+#             */
-/*   Updated: 2026/02/04 19:14:43 by nryser           ###   ########.ch       */
+/*   Created: 2026/02/08 18:17:13 by nryser            #+#    #+#             */
+/*   Updated: 2026/02/08 18:17:13 by nryser           ###   ########.ch       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,7 +48,7 @@ bool	RPN::isOperator(char c) const
 	Applies op to the top 2 stack values.
 
 	Important:
-	- The order matters: for "a b -" we must compute a - b
+	- The order matters: for "a b -" I must compute a - b
 	- Division by 0 is an error
 */
 void	RPN::applyOperator(char op)
@@ -103,7 +103,7 @@ void	RPN::evaluate(const std::string &expr)
 	while (iss >> tok)
 	{
 		/*
-			We accept only single-character tokens:
+			Accept only single-character tokens:
 			- digit '0'..'9'
 			- operator '+', '-', '*', '/'
 		*/
