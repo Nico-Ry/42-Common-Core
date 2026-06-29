@@ -150,7 +150,7 @@ Docker infrastructure project.
 | [ft_printf](./ft_printf)               | Recreation of `printf`                        | variadic functions, formatting, parsing       |
 | [get_next_line](./Get_Next_Line)       | Read files line by line                       | file descriptors, buffers, static variables   |
 | [Born2beroot](./Born2beroot)           | Linux server administration project           | virtualization, users, permissions, security  |
-| [push_swap](./push_swap_commented)     | Stack sorting algorithm project               | algorithms, complexity, optimization          |
+| [push_swap](./push_swap)     | Stack sorting algorithm project               | algorithms, complexity, optimization          |
 | [minitalk](./minitalk)                 | Client/server communication with Unix signals | signals, bit manipulation, IPC                |
 | [fract-ol](./fractol)                  | Fractal renderer                              | graphics, complex numbers, MiniLibX           |
 | [Philosophers](./Philosophers)         | Dining Philosophers problem                   | threads, mutexes, synchronization             |
