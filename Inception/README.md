@@ -58,11 +58,20 @@ The containers communicate through a Docker network and store persistent data us
 
 ---
 
-## Secrets and Configuration
+## Local Setup With Example Secrets
 
-This project uses file-based secrets so credentials can be injected into containers without hardcoding them directly in the Dockerfiles or Compose file.
+This repository includes example secret files with dummy values.
 
-For this educational repository, example secret files may be included with dummy values so the project can be executed easily in a local VM.
+To run the project locally, copy the example files into the real ignored locations:
+
+```bash
+cp -r secrets.example/* secrets/
+cp srcs/.env.example srcs/.env
+```
+
+Then edit the copied files if needed.
+
+The real secrets/ files and srcs/.env are ignored by Git and should not be committed.
 
 In a real deployment:
 
