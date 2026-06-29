@@ -156,7 +156,7 @@ Docker infrastructure project.
 | [Philosophers](./Philosophers)         | Dining Philosophers problem                   | threads, mutexes, synchronization             |
 | [Minishell](./Minishell)               | Unix shell recreation                         | processes, pipes, redirections, signals       |
 | [MiniRT](./MiniRt)                     | Ray tracing engine                            | 3D math, rendering, scene parsing             |
-| [CPP Modules](./CPP_Modules)           | C++ introduction modules                      | OOP, inheritance, templates, STL basics       |
+| [CPP Modules](./cppmodules)           | C++ introduction modules                      | OOP, inheritance, templates, STL basics       |
 | [Inception](./Inception)               | Docker infrastructure                         | containers, networking, Nginx, MariaDB        |
 | [Webserv](./Webserv)                   | HTTP server in C++                            | sockets, HTTP, CGI, non-blocking I/O          |
 | [ft_transcendence](./ft_transcendence) | Full-stack final project                      | backend, auth, realtime, database, Docker     |
